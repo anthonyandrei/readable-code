@@ -44,6 +44,12 @@ Two skills for code that people need to read:
 
 Project instructions and enforced tooling take precedence. The readability preferences include meaningful intermediate variables, separate lines for control-flow bodies, guard clauses, and helper extraction. Documentation follows the project's existing standard, with language-specific fallbacks when none is established.
 
+## Why readability is opt-in
+
+Making each step explicit can produce more verbose code and use more output tokens. That extra detail is most useful when someone is about to read or debug the code. Apply `readable-code` as a focused pass when you need to understand a particular path; expanding every file by default can add detail nobody reads.
+
+Controllers, entry points, and files that coordinate the main flow are useful starting points. Make their sequence of operations easy to follow from top to bottom, then use the function contracts maintained by `document-code` to understand the helpers they call. In an editor that displays documentation on hover, those contracts explain a function's purpose, inputs, results, and failures at the call site, reducing jumps into helper implementations.
+
 ## Install
 
 The bundled hooks require Node.js 20 or newer on `PATH`. Git is needed to detect shell-based edits; direct edit tracking also works outside Git. There are no npm dependencies or separate model API calls.
