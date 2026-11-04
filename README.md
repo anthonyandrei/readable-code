@@ -138,11 +138,12 @@ Run the focused hook checks with Node.js 20+ and Git:
 
 ```sh
 node --test tests/document-code.test.cjs
+node --test tests/plugin-loading.test.cjs
 ```
 
-The tests use disposable repositories and hook data directories. They do not install the plugin or modify the user's Codex configuration.
+The hook tests use disposable repositories and hook data directories. The plugin loading test requires the Codex CLI and installs the package into a temporary Codex home to verify that both skills and all three hooks appear. It does not execute the hooks or modify the user's Codex configuration.
 
-`plugin.json` is the portable manifest; `.agents/plugins/marketplace.json` exposes this repository's plugin at its root. Keep source paths inside the marketplace root and increment the manifest version when publishing an update.
+`.codex-plugin/plugin.json` declares the skills and hooks; `.agents/plugins/marketplace.json` exposes this repository's plugin at its root. Codex 0.166.0 reports no hooks for this package with a root `plugin.json`, so use the Codex compatibility manifest until portable hook discovery works. Keep source paths inside the marketplace root and increment the manifest version when publishing an update.
 
 ## License
 
