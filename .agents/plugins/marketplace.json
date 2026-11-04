@@ -1,0 +1,20 @@
+{
+  "name": "readable-code",
+  "interface": {
+    "displayName": "Readable code"
+  },
+  "plugins": [
+    {
+      "name": "readable-code",
+      "source": {
+        "source": "local",
+        "path": "./"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+# Local engineering guidance, kept out of the plugin repository
+/AGENTS.md
+/CLAUDE.md
+/GLOSSARY.md
+/GLOSSARY-MAP.md
+/CONTEXT.md
+/CONTEXT-MAP.md
+/docs/agents/

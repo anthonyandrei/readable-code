@@ -1,0 +1,4 @@
+interface:
+  display_name: "Document code"
+  short_description: "Document finished functions and complex reasoning"
+  default_prompt: "Use $document-code to review and document the functions changed in this task."

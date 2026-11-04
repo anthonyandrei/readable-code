@@ -1,0 +1,6 @@
+interface:
+  display_name: "Readable code"
+  short_description: "Make selected code easier for a human to follow"
+  default_prompt: "Use $readable-code to improve this code's readability while preserving its behavior."
+policy:
+  allow_implicit_invocation: false
