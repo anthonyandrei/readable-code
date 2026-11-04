@@ -123,19 +123,12 @@ flowchart TD
     Review --> Stop
 ```
 
-Snapshots fingerprint already dirty and untracked source files so unchanged pre-existing work is excluded. Direct `Edit`, `Write`, and `apply_patch` events use separate receipts to preserve parallel edits. Both tracking hooks run silently. Read-only and prose-only turns stay quiet unless source changes from another process occur during the turn.
+- Each pass covers a coding turn, which may finish before the whole project. The agent filters unrelated external edits from candidates and checks documentation accuracy.
+- Request `$document-code` manually for shell-only edits outside the session's repository, shell-only edits to ignored files, or unrecognized [source extensions](hooks/document-code.cjs). Direct `Edit`, `Write`, and `apply_patch` events also cover recognized sources outside Git and in ignored paths.
+- Tracking is silent and local, with no `SessionStart` hook. The final review loads the skill and candidate list into context and adds model work even if no documentation edits are needed. Its token cost varies.
+- State under `PLUGIN_DATA` contains paths, hashes, and completion markers, without source copies. Tracking failures warn you to request a manual pass and allow the task to finish.
 
-There is no `SessionStart` hook. Tracking runs locally, and candidate paths are written to a local artifact instead of injecting a file list after every edit. The skill and candidate list consume context when the final review runs. The review itself adds model work, even when it finds the documentation already complete. No fixed token overhead is guaranteed.
-
-`Stop` is a turn-completion event. It cannot determine when an entire multi-turn project is finished. Both a persisted marker and Codex's `stop_hook_active` flag prevent repeated completion requests.
-
-The hook only proposes paths; the agent uses task context to select the changed functions. It does not parse function bodies or certify documentation accuracy. Concurrent external edits may appear as candidates and must be excluded when unrelated.
-
-Git fallback covers dirty, staged, and untracked files that Git reports, plus edits committed during the turn. It does not track shell-only edits outside Git, shell-only edits to Git-ignored files, files outside the session's repository, or unrecognized source extensions. Direct edit events cover recognized source files outside Git or in ignored paths. Request `$document-code` explicitly when tracking cannot cover a task. Recognized extensions are listed in `hooks/document-code.cjs`.
-
-Hook state lives under Codex's `PLUGIN_DATA` directory. It contains local paths, content hashes, and completion markers, with separate state for each session, working directory, and turn. Source contents are not saved in that state. Tracking errors produce a warning recommending a manual pass and allow the task to finish.
-
-Disable the plugin in Codex to stop its hooks. Installing the skills alone provides manual use without the bundled automation.
+Disable the plugin to stop its hooks, or install the skills alone for manual use.
 
 ## Development
 
