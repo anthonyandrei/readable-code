@@ -1,6 +1,6 @@
 {
   "name": "readable-code",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Make selected code easier to read and document finished code changes.",
   "repository": "https://github.com/anthonyandrei/readable-code",
   "license": "MIT",

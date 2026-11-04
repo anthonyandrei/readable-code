@@ -150,11 +150,17 @@ function gitChanges(before, cwd) {
   });
 }
 
-/** Handle one lifecycle event; only Stop can return a model continuation. */
+/**
+ * Record Codex prompt baselines and source edits under PLUGIN_DATA.
+ * Return PostToolUse context once per turn; other events and later edits return {}.
+ * Filesystem and tracking errors propagate to main's manual-pass warning.
+ */
 function handleEvent(event) {
+  if (!['UserPromptSubmit', 'PostToolUse'].includes(event.hook_event_name))
+    return {};
   if (![event.cwd, event.session_id, event.turn_id].every(value => typeof value === 'string' && value.length > 0))
     return {};
-  if (event.stop_hook_active || !process.env.PLUGIN_DATA)
+  if (!process.env.PLUGIN_DATA)
     return {};
 
   const sessionKey = digest(`${event.session_id}\0${path.resolve(event.cwd)}`);
@@ -169,38 +175,16 @@ function handleEvent(event) {
     return {};
   }
 
-  if (event.hook_event_name === 'PostToolUse') {
-    const paths = editedPaths(event);
-    if (paths.length > 0) {
-      // Each tool gets its own receipt so parallel edits cannot overwrite one another.
-      const receiptKey = digest(event.tool_use_id || randomUUID());
-      writeJson(path.join(turnDirectory, `edit-${receiptKey}.json`), paths);
-    }
-    return {};
-  }
-
-  if (event.hook_event_name !== 'Stop')
-    return {};
-
-  const requestedFile = path.join(turnDirectory, 'review-requested');
-  if (fs.existsSync(requestedFile))
-    return {};
-
   const baseline = readJson(baselineFile);
-  const candidates = new Set(gitChanges(baseline?.git, event.cwd));
-  for (const file of fs.readdirSync(turnDirectory)) {
-    if (file.startsWith('edit-') && file.endsWith('.json')) {
-      for (const editedFile of readJson(path.join(turnDirectory, file)))
-        candidates.add(editedFile);
-    }
-  }
-
+  const candidates = new Set([...editedPaths(event), ...gitChanges(baseline?.git, event.cwd)]);
   const paths = [...candidates].filter(file => fingerprint(file) !== null).sort();
   if (paths.length === 0)
     return {};
 
-  const reviewFile = path.join(turnDirectory, 'review-paths.json');
-  writeJson(reviewFile, paths);
+  // Keep separate receipts so parallel edits and later changes remain available at review time.
+  const receiptKey = digest(event.tool_use_id || randomUUID());
+  writeJson(path.join(turnDirectory, `edit-${receiptKey}.json`), paths);
+  const requestedFile = path.join(turnDirectory, 'review-requested');
   try {
     fs.closeSync(fs.openSync(requestedFile, 'wx', 0o600));
   } catch (error) {
@@ -212,11 +196,15 @@ function handleEvent(event) {
 
   const skillFile = path.resolve(__dirname, '../skills/document-code/SKILL.md');
   return {
-    decision: 'block',
-    reason: `Perform one final documentation pass using the skill at ${JSON.stringify(skillFile)}. `
-      + `Read candidate paths from ${JSON.stringify(reviewFile)}; use task context to exclude unrelated edits. `
-      + 'Review the finished implementation, then hand off without repeating the pass. '
-      + 'If this pass already ran and the implementation has not changed since, finish without repeating it.',
+    hookSpecificOutput: {
+      hookEventName: 'PostToolUse',
+      additionalContext: 'Before your final response, finish implementation and validation, then perform one final '
+        + `documentation pass using the skill at ${JSON.stringify(skillFile)}. `
+        + `At review time, read the candidate path arrays in edit-*.json under ${JSON.stringify(turnDirectory)}. `
+        + 'Use the final task diff and context to select surviving task-related functions, including later changes. '
+        + 'Summarize the work and documentation together in one final response. '
+        + 'If this pass already ran and the implementation has not changed since, finish without repeating it.',
+    },
   };
 }
 

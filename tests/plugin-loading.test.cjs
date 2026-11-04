@@ -10,7 +10,7 @@ const test = require('node:test');
 const pluginRoot = path.resolve(__dirname, '..');
 const codex = process.env.CODEX_TEST_BINARY || 'codex';
 
-test('Codex discovers both skills and all three hooks after installation', { timeout: 30_000 }, async (t) => {
+test('Codex discovers both skills and the two tracking hooks after installation', { timeout: 30_000 }, async (t) => {
   const version = spawnSync(codex, ['--version'], { encoding: 'utf8', windowsHide: true });
   if (version.error?.code === 'ENOENT') {
     t.skip('Codex CLI is not installed');
@@ -78,6 +78,6 @@ test('Codex discovers both skills and all three hooks after installation', { tim
     'readable-code:document-code', 'readable-code:readable-code',
   ]);
   assert.deepEqual(detail.hooks.map((hook) => hook.eventName).sort(), [
-    'postToolUse', 'stop', 'userPromptSubmit',
+    'postToolUse', 'userPromptSubmit',
   ]);
 });
