@@ -105,9 +105,25 @@ The skills can be used independently in other skill-capable agents. Automatic co
 
 ## Hook behavior and limits
 
-- `UserPromptSubmit` silently fingerprints already dirty and untracked source files. This distinguishes later edits from unrelated work that was already present.
-- `PostToolUse` silently records paths from direct `Edit`, `Write`, and `apply_patch` events. Separate receipts preserve parallel edits.
-- `Stop` compares the final working tree with the baseline, combines direct-edit receipts, and requests one documentation pass for source candidates. Read-only and prose-only turns stay quiet unless source changes from another process occur during the turn.
+With the plugin enabled and its hooks trusted:
+
+```mermaid
+flowchart TD
+    Prompt["UserPromptSubmit: new turn"] --> Baseline["Snapshot existing Git changes"]
+    Baseline --> Work["Agent works on the task"]
+    Work -->|Direct source edit| Record["PostToolUse: record edited paths"]
+    Record --> Work
+    Work -->|Ready to finish| Stop{"Stop: review already requested<br/>or continuation active?"}
+    Stop -->|Yes| Finish["Finish without another request"]
+    Stop -->|No| Compare["Combine Git changes since the prompt<br/>with recorded edit paths"]
+    Compare --> Candidates{"Existing source candidates?"}
+    Candidates -->|No| Finish
+    Candidates -->|Yes| Request["Save candidates and mark review requested"]
+    Request --> Review["Ask the agent for one document-code pass<br/>on task-related changed functions"]
+    Review --> Stop
+```
+
+Snapshots fingerprint already dirty and untracked source files so unchanged pre-existing work is excluded. Direct `Edit`, `Write`, and `apply_patch` events use separate receipts to preserve parallel edits. Both tracking hooks run silently. Read-only and prose-only turns stay quiet unless source changes from another process occur during the turn.
 
 There is no `SessionStart` hook. Tracking runs locally, and candidate paths are written to a local artifact instead of injecting a file list after every edit. The skill and candidate list consume context when the final review runs. The review itself adds model work, even when it finds the documentation already complete. No fixed token overhead is guaranteed.
 
