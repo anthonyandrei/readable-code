@@ -39,8 +39,10 @@ function sendOverdueReminders(invoices, nowMs, sendReminder) {
 
 Two skills for code that people need to read:
 
-- `readable-code` improves names, expressions, and control flow in selected code. It runs only when explicitly requested.
-- `document-code` describes function contracts and explains complex reasoning. The Codex hook requests a final documentation pass after coding turns.
+| Skill | What it does | When it runs |
+| --- | --- | --- |
+| `readable-code` | Improves names, expressions, and control flow in selected code. | Only when explicitly requested. |
+| `document-code` | Describes function contracts and explains complex reasoning. | When requested, or as a final pass after coding turns with the Codex hooks enabled. |
 
 Project instructions and enforced tooling take precedence. The readability preferences include meaningful intermediate variables, separate lines for control-flow bodies, guard clauses, and helper extraction. Documentation follows the project's existing standard, with language-specific fallbacks when none is established.
 
