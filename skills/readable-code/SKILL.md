@@ -1,6 +1,7 @@
 ---
 name: readable-code
 description: Improve the readability of selected code while preserving its behavior. Apply only when explicitly requested.
+disable-model-invocation: true
 ---
 
 # Readable code
