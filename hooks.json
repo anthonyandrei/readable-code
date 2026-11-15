@@ -1,0 +1,7 @@
+{
+  "hooks": {
+    "PreInvocation": [{
+      "hooks": [{ "type": "command", "command": "node ./hooks/antigravity.cjs", "timeout": 20 }]
+    }]
+  }
+}

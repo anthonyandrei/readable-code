@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node -e \"require(require('path').join(process.env.PLUGIN_ROOT, 'hooks/document-code.cjs'))\"",
+            "command": "node -e \"require(require('path').join(process.env.PLUGIN_ROOT || process.env.CLAUDE_PLUGIN_ROOT, 'hooks/document-code.cjs'))\"",
             "timeout": 20
           }
         ]
@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node -e \"require(require('path').join(process.env.PLUGIN_ROOT, 'hooks/document-code.cjs'))\"",
+            "command": "node -e \"require(require('path').join(process.env.PLUGIN_ROOT || process.env.CLAUDE_PLUGIN_ROOT, 'hooks/document-code.cjs'))\"",
             "timeout": 20
           }
         ]

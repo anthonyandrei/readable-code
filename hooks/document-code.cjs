@@ -208,10 +208,14 @@ function handleEvent(event) {
   };
 }
 
-/** Consume Codex's JSON event; report tracking failures without blocking the coding task. */
+/** Consume a Codex or Claude Code event and report tracking failures without blocking the task. */
 function main() {
   try {
     const event = JSON.parse(fs.readFileSync(0, 'utf8'));
+    if (process.env.CLAUDE_PLUGIN_DATA) {
+      process.env.PLUGIN_DATA = process.env.CLAUDE_PLUGIN_DATA;
+      event.turn_id = event.prompt_id;
+    }
     process.stdout.write(JSON.stringify(handleEvent(event)));
   } catch {
     process.stderr.write('[document-code] Tracking failed. Run $document-code manually for this task.\n');

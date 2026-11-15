@@ -42,7 +42,7 @@ Two skills for code that people need to read:
 | Skill | What it does | When it runs |
 | --- | --- | --- |
 | `readable-code` | Improves names, expressions, and control flow in selected code. | Only when explicitly requested. |
-| `document-code` | Describes function contracts and explains complex reasoning. | When requested, or before the final response in coding turns with the Codex hooks enabled. |
+| `document-code` | Describes function contracts and explains complex reasoning. | When requested, or before the final response in coding turns with plugin hooks enabled. |
 
 Project instructions and enforced tooling take precedence. The readability preferences include meaningful intermediate variables, separate lines for control-flow bodies, guard clauses, and helper extraction. Documentation follows the project's existing standard, with language-specific fallbacks when none is established.
 
@@ -74,6 +74,10 @@ skillshare plugin add anthonyandrei/readable-code --plugin readable-code --targe
 
 Use `plugin add` to keep hooks and skills together. Installing only the skill directories does not install the automatic reminder.
 
+For Claude Code, Antigravity desktop, or Antigravity CLI, replace `codex` with `claude`, `antigravity`, or `antigravity-cli` respectively. The same commands accept a local checkout or the GitHub repository. Restart the host and enable or trust its hooks where required.
+
+Claude Code uses the source-change tracker. Antigravity supplies a reminder on model invocations because its post-tool hook cannot add context. The agent decides whether the task changed code and needs a `document-code` pass.
+
 ### Codex directly
 
 From a local checkout:
@@ -103,7 +107,7 @@ Use $document-code to document the functions in this module.
 
 With the plugin's hooks enabled, the first detected source change adds one reminder to the active turn's context: finish implementation and validation, then use `document-code` before the final response. The pass reviews the final implementation and treats comments written earlier in the task as drafts. Established project conventions refer to code that existed before the task. Project restrictions can place explanations in Markdown or another designated location, including notebooks that prohibit code comments and docstrings.
 
-The skills can be used independently in other skill-capable agents. The automatic reminder is implemented for Codex; other hosts need their own integration or an explicit documentation request. The skills' invocation settings use Codex's `agents/openai.yaml` convention.
+The skills can also be used independently in other skill-capable agents. The `agents/openai.yaml` files configure invocation in Codex.
 
 ## Hook behavior and limits
 
